@@ -1,63 +1,85 @@
 // import React, { useState, useEffect } from 'react';
+// import { Client } from '@stomp/stompjs';
+// import SockJS from 'sockjs-client';
 
-// const Chat = ({ currentUserId, targetUserId }) => {
+// const Chat = ({ userId }) => {
+//   const [users, setUsers] = useState([]);
 //   const [messages, setMessages] = useState([]);
 //   const [message, setMessage] = useState('');
+//   const [client, setClient] = useState(null);
 
-//   // Fetch chat history
+//   // Establish WebSocket connection
 //   useEffect(() => {
-//     const fetchMessages = async () => {
-//       const response = await fetch(`http://localhost:8080/api/chat/history/${currentUserId}/${targetUserId}`);
-//       const data = await response.json();
-//       setMessages(data);
-//     };
-
-//     fetchMessages();
-//   }, [currentUserId, targetUserId]);
-
-//   // Send message to the backend
-//   const handleSendMessage = async () => {
-//     const response = await fetch('http://localhost:8080/api/chat/send', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         sender: { id: currentUserId },
-//         receiver: { id: targetUserId },
-//         message: message,
-//       }),
+//     const stompClient = new Client({
+//       brokerURL: 'http://localhost:8080/chat', // WebSocket endpoint
+//       connectHeaders: {
+//         userId: userId,
+//       },
+//       onConnect: () => {
+//         stompClient.subscribe(`/topic/messages/${userId}`, (message) => {
+//           setMessages((prevMessages) => [
+//             ...prevMessages,
+//             message.body,
+//           ]);
+//         });
+//       },
+//       onDisconnect: () => {
+//         console.log('Disconnected from WebSocket');
+//       },
 //     });
 
-//     if (response.ok) {
-//       const newMessage = await response.json();
-//       setMessages([...messages, newMessage]);
-//       setMessage(''); // Clear input field
-//     } else {
-//       console.error('Failed to send message');
+//     setClient(stompClient);
+//     stompClient.activate();
+
+//     // Fetch users growing the same crops
+//     fetch(`/api/users/${userId}/same-crop-users`)
+//       .then((res) => res.json())
+//       .then(setUsers);
+
+//     return () => {
+//       if (client) {
+//         client.deactivate();
+//       }
+//     };
+//   }, [userId]);
+
+//   // Send message to another user
+//   const sendMessage = (receiverId) => {
+//     if (client && message) {
+//       client.publish({
+//         destination: `/app/chat`,
+//         body: JSON.stringify({ message, receiverId }),
+//       });
+//       setMessage('');
 //     }
 //   };
 
 //   return (
-//     <div style={{ padding: '20px' }}>
-//       <div style={{ maxHeight: '300px', overflowY: 'scroll', marginBottom: '10px' }}>
-//         {messages.map((msg, index) => (
-//           <div key={index} style={{ marginBottom: '10px' }}>
-//             <strong>{msg.sender.fullName}:</strong> {msg.message}
-//             <small style={{ display: 'block', fontSize: '12px', color: 'gray' }}>
-//               {new Date(msg.timestamp).toLocaleTimeString()}
-//             </small>
+//     <div>
+//       <h3>Chat</h3>
+//       <div>
+//         <h4>Users Growing the Same Crop</h4>
+//         {users.map((user) => (
+//           <div key={user.id}>
+//             <p>{user.username}</p>
+//             <button onClick={() => sendMessage(user.id)}>Send Message</button>
 //           </div>
 //         ))}
 //       </div>
-
+//       <div>
+//         <h4>Messages</h4>
+//         <div>
+//           {messages.map((msg, index) => (
+//             <p key={index}>{msg}</p>
+//           ))}
+//         </div>
+//       </div>
 //       <textarea
 //         value={message}
 //         onChange={(e) => setMessage(e.target.value)}
-//         rows="3"
-//         style={{ width: '100%' }}
+//         placeholder="Type a message"
 //       />
-//       <button onClick={handleSendMessage} style={{ marginTop: '10px' }}>
-//         Send
-//       </button>
+//       <button onClick={() => sendMessage()}>Send</button>
 //     </div>
 //   );
 // };
