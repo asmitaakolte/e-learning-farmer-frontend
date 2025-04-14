@@ -1,35 +1,33 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginForm from './components/LoginForm';
-import RegistrationForm from './components/RegistrationForm';
-import HomePage from './components/HomePage';
+// src/App.js
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import LearningModule from "./pages/LearningModule";
+import WasteModule from "./pages/WasteModule";
+import EventsModule from "./pages/EventsModule";
+import MarketplaceModule from "./pages/MarketplaceModule";
+import ExpertQAModule from "./pages/ExpertQAModule";
+import Login from './pages/Login';
+import Community from "./pages/Community";
 
-const App = () => {
-  const [currentUser, setCurrentUser] = useState(null);
 
-  // Handle login and registration success
-  const handleLoginSuccess = (userData) => {
-    setCurrentUser(userData);
-  };
-
-  const handleRegisterSuccess = (userData) => {
-    setCurrentUser(userData);
-  };
-
+function App() {
   return (
     <Router>
       <Routes>
-        {/* Login route */}
-        <Route path="/" element={<LoginForm onLoginSuccess={handleLoginSuccess} />} />
-
-        {/* Registration route */}
-        <Route path="/register" element={<RegistrationForm onRegisterSuccess={handleRegisterSuccess} />} />
-
-        {/* HomePage route, protected */}
-        <Route path="/home" element={currentUser ? <HomePage currentUser={currentUser} /> : <LoginForm onLoginSuccess={handleLoginSuccess} />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/learning" element={<LearningModule />} />
+        <Route path="/waste" element={<WasteModule />} />
+        <Route path="/events" element={<EventsModule />} />
+        <Route path="/marketplace" element={<MarketplaceModule />} />
+        <Route path="/experts" element={<ExpertQAModule />} />
+        <Route path="/community" element={<Community />} />
       </Routes>
     </Router>
   );
-};
+}
 
+<div className="bg-yellow-100 text-black p-4 rounded-xl">
+  ✅ Tailwind is working!
+</div>
 export default App;
